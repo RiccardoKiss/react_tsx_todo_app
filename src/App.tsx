@@ -1,9 +1,12 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
 
-function App() {
+const App = () => {
   return (
+    /*
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
@@ -19,7 +22,14 @@ function App() {
           Learn React
         </a>
       </header>
-    </div>
+    </div>*/
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="todoList" element={<p>todoList</p>} />
+        <Route path="*" element={<p>not found</p>} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
