@@ -1,8 +1,11 @@
-import { iteratorSymbol } from 'immer/dist/internal';
 import React, { useState } from 'react';
-import TodoItem, { TodoItemProps } from './TodoItem';
+import { styled } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
 import List from '@mui/material/List';
+
+import TodoItem, { TodoItemProps } from './TodoItem';
 import { mockapiUrl } from '../utils/mockapiUrl';
+import { colors, Typography } from '@mui/material';
 
 export interface TodoListProps {
   id: number;
@@ -11,26 +14,34 @@ export interface TodoListProps {
   items: [];
 }
 
-const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
+const Item = styled(Paper)(() => ({
+  backgroundColor: '#f2bb72',
+  padding: '3%',
+  textAlign: 'start',
+}));
 
+const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
   return (
-    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-      {
-        items.map((item: TodoItemProps) => {
-          return (
-            <TodoItem
-              id={item.id} 
-              todoListId={item.todoListId} 
-              createdAt={item.createdAt} 
-              title={item.title} 
-              task={item.task} 
-              deadline={item.deadline} 
-              completion={item.completion}
-            />
-          )
-        })
-      }
-    </List>
+    <Item>
+      <Typography variant='h4' fontWeight={'bold'}>#{id}: {title}</Typography>
+      <List sx={{ width: '100%', maxWidth: 500,  bgcolor: '#f5ce9a' }}>
+        {
+          items.map((item: TodoItemProps) => {
+            return (
+              <TodoItem
+                id={item.id} 
+                todoListId={item.todoListId} 
+                createdAt={item.createdAt} 
+                title={item.title} 
+                task={item.task} 
+                deadline={item.deadline} 
+                completion={item.completion}
+              />
+            )
+          })
+        }
+      </List>
+    </Item>
   );
 }
 

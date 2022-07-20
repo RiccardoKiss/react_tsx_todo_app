@@ -1,8 +1,23 @@
-import { Link } from 'react-router-dom';
-import Button from '@mui/material/Button';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { styled } from '@mui/material/styles';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+
 import TodoList, { TodoListProps } from '../components/TodoList';
 import { mockapiUrl } from '../utils/mockapiUrl';
+
+const MyAppBar = styled(AppBar)(() => ({
+  backgroundColor: '#2d3a52',
+  marginBottom: '3%',
+}));
+
+const MyToolBar = styled(Toolbar)(() => ({
+  justifyContent: 'space-between',
+}));
 
 const Home = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -39,25 +54,29 @@ const Home = () => {
   }, [todoLists]);
 
   return (
-    <>
-      <p>{day}.{month}.{year} | {time} | {jsonDate}</p>
-      {todoLists.map((item: TodoListProps) => {
-        return (
-          <>
-            <TodoList 
-              id={item.id} 
-              title={item.title} 
-              createdAt={item.createdAt} 
-              items={item.items}
-            />
-            <br></br>
-          </>
-        )
-      })}
-      
-      <Link to={"/todoList"}>go to todoList</Link> 
-      <Button href='/todoList' color='primary' variant='contained'>+ Add List</Button>
-    </>
+    <Box sx={{ flexGrow: 1 }}>
+      <MyAppBar position="static">
+        <MyToolBar>
+          <p>{day}.{month}.{year} | {time} | {jsonDate}</p>
+          <Button href='/todoList' color='primary' variant='contained'>+ Add List</Button>
+        </MyToolBar>
+      </MyAppBar>
+      <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12}} justifyContent="space-evenly">
+        {todoLists.map((item: TodoListProps) => {
+          return (
+            <Grid item xs={2} sm={4} md={3}>
+              <TodoList 
+                id={item.id} 
+                title={item.title} 
+                createdAt={item.createdAt} 
+                items={item.items}
+              />
+              <br></br>
+            </Grid>
+          )
+        })}
+      </Grid>
+    </Box>
   )
 }
 
