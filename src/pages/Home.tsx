@@ -1,19 +1,10 @@
 import { Link } from 'react-router-dom';
 import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useState, useEffect } from 'react';
-import TodoList from '../components/TodoList';
-
-interface TodoListProps {
-  id: number;
-  createdAt: Date;
-  title: string;
-  items: [];
-}
+import TodoList, { TodoListProps } from '../components/TodoList';
+import { mockapiUrl } from '../utils/mockapiUrl';
 
 const Home = () => {
-  const mockapi = "https://62d695c251e6e8f06f0d98e8.mockapi.io/";
   const [isLoaded, setIsLoaded] = useState(false);
   const [todoLists, setTodoLists] = useState([]);
 
@@ -41,7 +32,7 @@ const Home = () => {
   }
 
   useEffect(() => {
-    if(!isLoaded) getTodoLists(mockapi);
+    if(!isLoaded) getTodoLists(mockapiUrl);
     //getTodoLists(mockapi);
     console.log("todoLists2:");
     console.dir(todoLists);
@@ -52,20 +43,20 @@ const Home = () => {
       <p>{day}.{month}.{year} | {time} | {jsonDate}</p>
       {todoLists.map((item: TodoListProps) => {
         return (
-          <TodoList 
-            id={item.id} 
-            title={item.title} 
-            createdAt={item.createdAt} 
-            items={item.items}
-          />
+          <>
+            <TodoList 
+              id={item.id} 
+              title={item.title} 
+              createdAt={item.createdAt} 
+              items={item.items}
+            />
+            <br></br>
+          </>
         )
       })}
       
       <Link to={"/todoList"}>go to todoList</Link> 
       <Button href='/todoList' color='primary' variant='contained'>+ Add List</Button>
-      <IconButton aria-label="delete">
-        <DeleteIcon />
-      </IconButton>
     </>
   )
 }

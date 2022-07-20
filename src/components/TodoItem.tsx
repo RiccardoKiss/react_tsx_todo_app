@@ -1,7 +1,15 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import Checkbox from '@mui/material/Checkbox';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { mockapiUrl } from '../utils/mockapiUrl';
+import { Typography } from '@mui/material';
 
-interface TodoItemProps {
+export interface TodoItemProps {
   id: number;
   todoListId: number;
   createdAt: Date;
@@ -12,10 +20,60 @@ interface TodoItemProps {
 }
 
 const TodoItem = ({ id, todoListId, createdAt, title, task, deadline, completion }: TodoItemProps) => {
+  const [checked, setChecked] = useState(completion);
+
+  const handleToggle = (value: boolean) => () => {
+    setChecked(!value);
+  };
+
+  const putTask = async () => {
+    const requestOptions = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        "completion": checked,  
+      })
+    };
+    await fetch(mockapiUrl + "/todoLists/" + todoListId + "/todoItems/" + id, requestOptions)
+    .then(response => response.json())   
+    .then(data => {
+      console.log("Data:" + data)
+    })
+    .catch(error => {console.log(error)})
+  };
+
+  useEffect(() => {
+    putTask();
+  }, [checked]);
+
   return (
-    <li key={id}>
-      title:{title}, task:{task}, completion:{completion}
-    </li>
+    <ListItem
+      key={id}
+      disablePadding
+      secondaryAction={
+        <IconButton aria-label="delete">
+          <DeleteIcon />
+        </IconButton>
+      }
+    >
+      <ListItemButton role={undefined} onClick={handleToggle(checked)} dense>
+        <ListItemIcon>
+          <Checkbox
+            edge="start"
+            checked={checked}
+            tabIndex={-1}
+            disableRipple
+          />
+        </ListItemIcon>
+        <ListItemText id={id.toString()} primary={
+          <>
+            <Typography variant="h6">{title}</Typography>
+            <Typography variant="body2">{task}</Typography>
+            <Typography variant="caption">{JSON.stringify(deadline)}</Typography>
+          </>
+        } />
+      </ListItemButton>
+    </ListItem>
   );
 }
 

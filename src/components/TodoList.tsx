@@ -1,6 +1,8 @@
 import { iteratorSymbol } from 'immer/dist/internal';
-import React, { Component } from 'react';
-import TodoItem from './TodoItem';
+import React, { useState } from 'react';
+import TodoItem, { TodoItemProps } from './TodoItem';
+import List from '@mui/material/List';
+import { mockapiUrl } from '../utils/mockapiUrl';
 
 export interface TodoListProps {
   id: number;
@@ -9,36 +11,26 @@ export interface TodoListProps {
   items: [];
 }
 
-interface TodoItemProps {
-  id: number;
-  todoListId: number;
-  createdAt: Date;
-  title: string;
-  task: string;
-  deadline: Date;
-  completion: boolean;
-}
-
 const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
+
   return (
-    <>
-      <p>{title}</p>
-      <ul>
-        {items.map((item: TodoItemProps) => {
+    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+      {
+        items.map((item: TodoItemProps) => {
           return (
-            <TodoItem 
+            <TodoItem
               id={item.id} 
-              todoListId={item.todoListId}  
+              todoListId={item.todoListId} 
               createdAt={item.createdAt} 
               title={item.title} 
               task={item.task} 
               deadline={item.deadline} 
               completion={item.completion}
-          />
+            />
           )
-        })}
-      </ul>
-    </>
+        })
+      }
+    </List>
   );
 }
 

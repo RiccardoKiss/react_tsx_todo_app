@@ -1,0 +1,1 @@
+export const mockapiUrl = "https://62d695c251e6e8f06f0d98e8.mockapi.io/";
