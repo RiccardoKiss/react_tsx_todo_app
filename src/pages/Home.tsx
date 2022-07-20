@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
+import { Typography } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 
 import TodoList, { TodoListProps } from '../components/TodoList';
 import { mockapiUrl } from '../utils/mockapiUrl';
+
 
 const MyAppBar = styled(AppBar)(() => ({
   backgroundColor: '#2d3a52',
@@ -28,7 +29,6 @@ const Home = () => {
   const month = fullDate.getMonth()+1;
   const year = fullDate.getFullYear();
   const time = fullDate.getHours() + ':' + fullDate.getMinutes();
-  const jsonDate = JSON.stringify(fullDate);
 
   const getTodoLists = async (url: string) => {
     url += "todoLists";
@@ -57,8 +57,9 @@ const Home = () => {
     <Box sx={{ flexGrow: 1 }}>
       <MyAppBar position="static">
         <MyToolBar>
-          <p>{day}.{month}.{year} | {time} | {jsonDate}</p>
-          <Button href='/todoList' color='primary' variant='contained'>+ Add List</Button>
+          <Typography variant='subtitle1'>{day}.{month}.{year} | {time}</Typography>
+          <Typography variant='h5'>TODO App</Typography>
+          <Button href='/todoList' color='success' variant='contained'>+ Add List</Button>
         </MyToolBar>
       </MyAppBar>
       <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12}} justifyContent="space-evenly">

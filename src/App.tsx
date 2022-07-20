@@ -3,6 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
+import AddList from './pages/AddList';
 
 const App = () => {
   return (
@@ -26,7 +27,7 @@ const App = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="todoList" element={<p>todoList</p>} />
+        <Route path="todoList" element={<AddList />} />
         <Route path="*" element={<p>not found</p>} />
       </Routes>
     </BrowserRouter>

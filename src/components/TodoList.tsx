@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import List from '@mui/material/List';
+import { Typography } from '@mui/material';
 
 import TodoItem, { TodoItemProps } from './TodoItem';
 import { mockapiUrl } from '../utils/mockapiUrl';
-import { colors, Typography } from '@mui/material';
+
 
 export interface TodoListProps {
   id: number;
