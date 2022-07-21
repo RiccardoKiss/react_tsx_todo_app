@@ -23,6 +23,7 @@ export interface TodoItemProps {
 
 const TodoItem = ({ id, todoListId, createdAt, title, task, deadline, completion }: TodoItemProps) => {
   const [checked, setChecked] = useState(completion);
+  const [deleted, setDeleted] = useState(false);
 
   const handleToggle = (value: boolean) => () => {
     setChecked(!value);
@@ -36,7 +37,7 @@ const TodoItem = ({ id, todoListId, createdAt, title, task, deadline, completion
         "completion": checked,  
       })
     };
-    await fetch(mockapiUrl + "/todoLists/" + todoListId + "/todoItems/" + id, requestOptions)
+    await fetch(mockapiUrl + "todoLists/" + todoListId + "/todoItems/" + id, requestOptions)
     .then(response => response.json())   
     .then(data => {
       console.log("Data:" + data)
@@ -44,16 +45,35 @@ const TodoItem = ({ id, todoListId, createdAt, title, task, deadline, completion
     .catch(error => {console.log(error)})
   };
 
+  const deleteTask = async () => {
+    const requestOptions = {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    };
+    await fetch(mockapiUrl + "todoLists/" + todoListId + "/todoItems/" + id, requestOptions)
+    .then(response => {
+      console.log(response);
+    })
+    .catch(error => console.log(error))
+  };
+
   useEffect(() => {
     putTask();
   }, [checked]);
 
+  useEffect(() => {
+    if(deleted)
+      deleteTask();
+  }, [deleted]);
+
+
   return (
+    deleted ? <></> :
     <ListItem
       key={id}
       disablePadding
       secondaryAction={
-        <IconButton aria-label="delete">
+        <IconButton edge="end" aria-label="delete" onClick={() => setDeleted(true)} >
           <DeleteIcon />
         </IconButton>
       }
@@ -76,6 +96,7 @@ const TodoItem = ({ id, todoListId, createdAt, title, task, deadline, completion
         } />
       </ListItemButton>
     </ListItem>
+    
   );
 }
 
