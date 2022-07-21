@@ -18,6 +18,11 @@ import * as yup from 'yup';
 
 import { mockapiUrl } from '../utils/mockapiUrl';
 
+interface formData {
+  listTitle: string,
+  itemTitle: string,
+  itemTask: string,
+};
 
 const MyAppBar = styled(AppBar)(() => ({
   backgroundColor: '#2d3a52',
@@ -54,6 +59,8 @@ const AddList = () => {
   const time = fullDate.getHours() + ':' + fullDate.getMinutes();
 
   const [formData, setFormData] = useState({});
+  const [todoLists, setTodoLists] = useState([]);
+  const [latestListId, setLatestListId] = useState(0);
 
   const formik = useFormik({
     initialValues: {
@@ -63,15 +70,61 @@ const AddList = () => {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
+      //alert(JSON.stringify(values, null, 2));
       setFormData(values);
+      postList(values);
     },
   });
+  
+  const getLatestListId = async () => {
+    await fetch(mockapiUrl+"todoLists")
+    .then(response => response.json())   
+    .then(data => {
+      setLatestListId(data.length);  // size of List array is 'id' of last List
+    })
+    .catch(error => {console.log(error)})
+  };
+
+  const postList = async (values: formData) => {
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        "createdAt": new Date(),
+        "title": values.listTitle,
+      })
+    };
+    await fetch(mockapiUrl+"todoLists", requestOptions)
+    .then(async (response) => {
+      if(response.status == 201) {
+        await getLatestListId();
+        const requestOptions = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            "createdAt": new Date(),
+            "title": values.itemTitle,
+            "task": values.itemTask,
+            "deadline": new Date(),
+            "completion": false,
+          })
+        };
+        await fetch(mockapiUrl+"todoLists/" + (latestListId+1).toString() + "/todoItems", requestOptions)
+        .then(response => {
+          if(response.status == 201) 
+            alert("Item added successfully.")
+        })
+        .catch(error => {alert(error)})
+      }
+    })
+    .catch(error => {alert(error)})
+  };
 
   useEffect(() => {
     if(Object.keys(formData).length != 0)  // if object is not empty
       console.log(formData);
   }, [formData]);
+
 
   return (
     <Box sx={{ flexGrow: 1 }}>
