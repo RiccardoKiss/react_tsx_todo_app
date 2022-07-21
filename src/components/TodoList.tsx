@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import List from '@mui/material/List';
@@ -6,7 +6,10 @@ import { Box, Typography } from '@mui/material';
 import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
+import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TodoItem, { TodoItemProps } from './TodoItem';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -87,6 +90,29 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
   const minute = fullDate.getMinutes();
   const [displayItemForm, setDisplayItemForm] = useState(false);
   const [tasks, setTasks] = useState(items);
+  const [filter, setFilter] = useState('');
+
+  const handleFilter = async (event: SelectChangeEvent) => {
+    setFilter(event.target.value);
+    await fetch(mockapiUrl+"todoLists/" + id + "/todoItems" + event.target.value)
+    .then(response => response.json())
+    .then(data => {
+      setTasks(data)
+      console.log(data);
+    })
+    .catch(error => {alert(error)})
+  }
+
+  const filterTasks = async () => {
+    console.log(filter);
+    await fetch(mockapiUrl+"todoLists/" + id + "/todoItems" + filter)
+    .then(response => response.json())
+    .then(data => {
+      setTasks(data)
+      console.log(data);
+    })
+    .catch(error => {alert(error)})
+  };
 
   const postItem = async (values: formData) => {
     const requestOptions = {
@@ -106,6 +132,7 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
         await fetch(mockapiUrl+"todoLists/" + id + "/todoItems")
         .then(response => response.json())
         .then(data => setTasks(data))
+        .catch(error => {alert(error)})
       }
     })
     .catch(error => {alert(error)})
@@ -128,8 +155,7 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
       setDisplayItemForm(false);
     },
   });
-
-
+  
 
   return (
     <Item elevation={2}>
@@ -281,8 +307,22 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
           </Grid>
         </form>
       }
-      <Box mt={2} ml={'35%'}>
+      <Box mt={2} ml={'37.5%'}>
         <Button color='primary' variant='contained' onClick={() => setDisplayItemForm(true)}>+ Add item</Button>
+        <FormControl sx={{ marginLeft: 3, minWidth: 115 }} size="small">
+          <InputLabel id="filter-task-input-label">Task Filter</InputLabel>
+          <Select
+            labelId="filter-task-label"
+            id="filter-task"
+            value={filter}
+            label="Task Filter"
+            onChange={handleFilter}
+          >
+            <MenuItem value={'?completion='}>All</MenuItem>
+            <MenuItem value={'?completion=false'}>Active</MenuItem>
+            <MenuItem value={'?completion=true'}>Finished</MenuItem>
+          </Select>
+        </FormControl>
       </Box>
     </Item>
   );
