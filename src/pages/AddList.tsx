@@ -7,6 +7,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
@@ -17,11 +18,17 @@ import { Formik, Field, Form, FormikHelpers, useFormik } from 'formik';
 import * as yup from 'yup';
 
 import { mockapiUrl } from '../utils/mockapiUrl';
+import { months, days, hours, minutes } from '../utils/dateUtils';
 
 interface formData {
   listTitle: string,
   itemTitle: string,
   itemTask: string,
+  dlYear: number,
+  dlMonth: number,
+  dlDay: number,
+  dlHour: number,
+  dlMinute: number,
 };
 
 const MyAppBar = styled(AppBar)(() => ({
@@ -39,6 +46,8 @@ const Item = styled(Paper)(() => ({
   //justifyContent: 'space-evenly',
 }));
 
+
+
 const validationSchema = yup.object({
   listTitle: yup
     .string()
@@ -49,6 +58,36 @@ const validationSchema = yup.object({
   itemTask: yup
     .string()
     .required('Task description is required'),
+  dlYear: yup
+    .number()
+    .positive()
+    .integer()
+    .min(new Date().getFullYear())
+    .required('Year is required'),
+  dlMonth: yup
+    .number()
+    .integer()
+    .min(1)
+    .max(12)
+    .required('Month is required'),
+  dlDay: yup
+    .number()
+    .integer()
+    .min(1)
+    .max(31)
+    .required('Day is required'),
+  dlHour: yup
+    .number()
+    .integer()
+    .min(0)
+    .max(23)
+    .required('Hour is required'),
+  dlMinute: yup
+    .number()
+    .integer()
+    .min(0)
+    .max(59)
+    .required('Minute is required'),
 });
 
 const AddList = () => {
@@ -56,10 +95,10 @@ const AddList = () => {
   const day = fullDate.getDate();
   const month = fullDate.getMonth()+1;
   const year = fullDate.getFullYear();
-  const time = fullDate.getHours() + ':' + fullDate.getMinutes();
+  const hour = fullDate.getHours();
+  const minute = fullDate.getMinutes();
+  const time = hour + ':' + minute;
 
-  const [formData, setFormData] = useState({});
-  const [todoLists, setTodoLists] = useState([]);
   const [latestListId, setLatestListId] = useState(0);
 
   const formik = useFormik({
@@ -67,11 +106,17 @@ const AddList = () => {
       listTitle: '',
       itemTitle: '',
       itemTask: '',
+      dlYear: year,
+      dlMonth: month,
+      dlDay: day,
+      dlHour: hour,
+      dlMinute: minute,
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       //alert(JSON.stringify(values, null, 2));
-      setFormData(values);
+      //console.log(values);
+      //console.log(JSON.stringify(new Date(values.dlYear, values.dlMonth-1, values.dlDay, values.dlHour, values.dlMinute)));
       postList(values);
     },
   });
@@ -81,6 +126,7 @@ const AddList = () => {
     .then(response => response.json())   
     .then(data => {
       setLatestListId(data.length);  // size of List array is 'id' of last List
+      console.log(data.length);
     })
     .catch(error => {console.log(error)})
   };
@@ -98,6 +144,7 @@ const AddList = () => {
     .then(async (response) => {
       if(response.status == 201) {
         await getLatestListId();
+        //console.log(latestListId);
         const requestOptions = {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -105,7 +152,7 @@ const AddList = () => {
             "createdAt": new Date(),
             "title": values.itemTitle,
             "task": values.itemTask,
-            "deadline": new Date(),
+            "deadline": new Date(values.dlYear, values.dlMonth-1, values.dlDay, values.dlHour, values.dlMinute),
             "completion": false,
           })
         };
@@ -120,12 +167,6 @@ const AddList = () => {
     .catch(error => {alert(error)})
   };
 
-  useEffect(() => {
-    if(Object.keys(formData).length != 0)  // if object is not empty
-      console.log(formData);
-  }, [formData]);
-
-
   return (
     <Box sx={{ flexGrow: 1 }}>
       <MyAppBar position="static">
@@ -137,9 +178,9 @@ const AddList = () => {
       </MyAppBar>
       <Grid container direction="column" spacing={2} justifyContent="center" alignItems="center">
         <Grid item>
-          <Item elevation={6} >
+          <Item elevation={6} sx={{width: '110%'}} >
               <form onSubmit={formik.handleSubmit}>
-                <Grid container  px={2} py={1} spacing={3} direction="column" justifyContent="space-evenly" alignItems="center">
+                <Grid container px={1} py={1} spacing={1} direction="column" justifyContent="space-evenly" alignItems="center">
                   <Grid item>
                     <TextField 
                       id="listTitle" 
@@ -182,6 +223,98 @@ const AddList = () => {
                       error={formik.touched.itemTask && Boolean(formik.errors.itemTask)}
                       helperText={formik.touched.itemTask && formik.errors.itemTask}
                     />
+                  </Grid>
+                  <Grid container direction="row" pt={2} justifyContent="space-evenly" alignItems="center" >
+                  <Grid item>
+                    <TextField 
+                    sx={{width: '8ch'}}
+                      id="dlYear" 
+                      name="dlYear" 
+                      label="Year" 
+                      variant="outlined"
+                      value={formik.values.dlYear}
+                      onChange={formik.handleChange}
+                      error={formik.touched.dlYear && Boolean(formik.errors.dlYear)}
+                      helperText={formik.touched.dlYear && formik.errors.dlYear}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField 
+                      select
+                      sx={{width: '15ch'}}
+                      id="dlMonth" 
+                      name="dlMonth" 
+                      label="Month" 
+                      variant="outlined"
+                      value={formik.values.dlMonth}
+                      onChange={formik.handleChange}
+                      error={formik.touched.dlMonth && Boolean(formik.errors.dlMonth)}
+                      helperText={formik.touched.dlMonth && formik.errors.dlMonth}
+                    >
+                      {months.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item>
+                    <TextField 
+                      select
+                      id="dlDay" 
+                      name="dlDay" 
+                      label="Day" 
+                      variant="outlined"
+                      value={formik.values.dlDay}
+                      onChange={formik.handleChange}
+                      error={formik.touched.dlDay && Boolean(formik.errors.dlDay)}
+                      helperText={formik.touched.dlDay && formik.errors.dlDay}
+                    >
+                      {days.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item>
+                    <TextField 
+                      select
+                      id="dlHour" 
+                      name="dlHour" 
+                      label="Hour" 
+                      variant="outlined"
+                      value={formik.values.dlHour}
+                      onChange={formik.handleChange}
+                      error={formik.touched.dlHour && Boolean(formik.errors.dlHour)}
+                      helperText={formik.touched.dlHour && formik.errors.dlHour}
+                    >
+                      {hours.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item>
+                    <TextField 
+                      select
+                      id="dlMinute" 
+                      name="dlMinute" 
+                      label="Minute" 
+                      variant="outlined"
+                      value={formik.values.dlMinute}
+                      onChange={formik.handleChange}
+                      error={formik.touched.dlMinute && Boolean(formik.errors.dlMinute)}
+                      helperText={formik.touched.dlMinute && formik.errors.dlMinute}
+                    >
+                      {minutes.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
                   </Grid>
                   <Grid item>
                     <Button color='primary' variant='contained' type='submit'>SUBMIT</Button>
