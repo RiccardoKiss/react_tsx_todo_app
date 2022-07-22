@@ -91,6 +91,7 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
   const [displayItemForm, setDisplayItemForm] = useState(false);
   const [tasks, setTasks] = useState(items);
   const [filter, setFilter] = useState('');
+  const [search, setSearch] = useState('');
 
   const handleFilter = async (event: SelectChangeEvent) => {
     setFilter(event.target.value);
@@ -101,6 +102,10 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
       console.log(data);
     })
     .catch(error => {alert(error)})
+  };
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(event.target.value);
   }
 
   const filterTasks = async () => {
@@ -159,19 +164,23 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
 
   return (
     <Item elevation={2}>
-      <Typography variant='h4' fontWeight={'bold'}>#{id}: {title}</Typography>
+      <Box mb={1} sx={{display: 'flex', justifyContent: 'space-between'}}>
+        <Typography variant='h4' fontWeight={'bold'}>#{id}: {title}</Typography>
+        <TextField size='small' sx={{width: '25%'}} id='search-bar' label='Search' variant='outlined' value={search} onChange={handleSearch} />
+      </Box>
       <List sx={{ width: '100%', maxWidth: 500,  bgcolor: '#f5ce9a' }}>
         {
           tasks.map((item: TodoItemProps) => {
             return (
               <TodoItem
-                id={item.id} 
-                todoListId={item.todoListId} 
-                createdAt={item.createdAt} 
-                title={item.title} 
-                task={item.task} 
-                deadline={item.deadline} 
+                id={item.id}
+                todoListId={item.todoListId}
+                createdAt={item.createdAt}
+                title={item.title}
+                task={item.task}
+                deadline={item.deadline}
                 completion={item.completion}
+                search={search}
               />
             )
           })

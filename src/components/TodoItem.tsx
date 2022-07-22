@@ -21,13 +21,26 @@ export interface TodoItemProps {
   completion: boolean;
 }
 
-const TodoItem = ({ id, todoListId, createdAt, title, task, deadline, completion }: TodoItemProps) => {
+interface ItemProps {
+  id: number;
+  todoListId: number;
+  createdAt: Date;
+  title: string;
+  task: string;
+  deadline: Date;
+  completion: boolean;
+  search: string;
+}
+
+const TodoItem = ({ id, todoListId, createdAt, title, task, deadline, completion, search}: ItemProps) => {
   const [checked, setChecked] = useState(completion);
   const [deleted, setDeleted] = useState(false);
 
   const handleToggle = (value: boolean) => () => {
     setChecked(!value);
   };
+
+
 
   const putTask = async () => {
     const requestOptions = {
@@ -78,7 +91,7 @@ const TodoItem = ({ id, todoListId, createdAt, title, task, deadline, completion
         </IconButton>
       }
     >
-      <ListItemButton role={undefined} onClick={handleToggle(checked)} dense>
+      <ListItemButton role={undefined} onClick={handleToggle(checked)} dense disabled={!(title+task).includes(search)}>
         <ListItemIcon>
           <Checkbox
             edge="start"
