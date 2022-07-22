@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import { Typography } from '@mui/material';
 import Paper from '@mui/material/Paper';
@@ -95,8 +94,6 @@ const AddList = () => {
   const minute = fullDate.getMinutes();
   const time = hour + ':' + minute;
 
-  const [latestListId, setLatestListId] = useState(0);
-
   const formik = useFormik({
     initialValues: {
       listTitle: '',
@@ -112,20 +109,9 @@ const AddList = () => {
     onSubmit: (values) => {
       //alert(JSON.stringify(values, null, 2));
       //console.log(values);
-      //console.log(JSON.stringify(new Date(values.dlYear, values.dlMonth-1, values.dlDay, values.dlHour, values.dlMinute)));
       postList(values);
     },
   });
-  
-  const getLatestListId = async () => {
-    await fetch(mockapiUrl+"todoLists")
-    .then(response => response.json())   
-    .then(data => {
-      setLatestListId(data.length);  // size of List array is 'id' of last List
-      console.log(data.length);
-    })
-    .catch(error => {console.log(error)})
-  };
 
   const postList = async (values: formData) => {
     const requestOptions = {
@@ -136,26 +122,29 @@ const AddList = () => {
         "title": values.listTitle,
       })
     };
-    await fetch(mockapiUrl+"todoLists", requestOptions)
+    await fetch(mockapiUrl+"todoLists", requestOptions) // POST for List
     .then(async (response) => {
-      if(response.status == 201) {
-        await getLatestListId();
-        //console.log(latestListId);
-        const requestOptions = {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            "createdAt": new Date(),
-            "title": values.itemTitle,
-            "task": values.itemTask,
-            "deadline": new Date(values.dlYear, values.dlMonth-1, values.dlDay, values.dlHour, values.dlMinute),
-            "completion": false,
+      if(response.status === 201) {
+        await fetch(mockapiUrl+"todoLists")  // GET for getting id of last List
+        .then(response => response.json())   
+        .then(async (data) => {
+          const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              "createdAt": new Date(),
+              "title": values.itemTitle,
+              "task": values.itemTask,
+              "deadline": new Date(values.dlYear, values.dlMonth-1, values.dlDay, values.dlHour, values.dlMinute),
+              "completion": false,
+            })
+          };
+          await fetch(mockapiUrl+"todoLists/" + (data.length).toString() + "/todoItems", requestOptions)  // POST for Item
+          .then(response => {
+            if(response.status === 201) 
+              alert("Item added successfully.")
           })
-        };
-        await fetch(mockapiUrl+"todoLists/" + (latestListId+1).toString() + "/todoItems", requestOptions)
-        .then(response => {
-          if(response.status == 201) 
-            alert("Item added successfully.")
+          .catch(error => {alert(error)})
         })
         .catch(error => {alert(error)})
       }

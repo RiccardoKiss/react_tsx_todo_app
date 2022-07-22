@@ -35,22 +35,18 @@ const Home = () => {
     await fetch(url)
     .then(response => response.json())   
     .then(data => {
-      console.log("Data:");
-      console.dir(data);
-      //setTodoLists([...todoLists, data]);
+      //console.dir(data);
       setTodoLists(data);
       setIsLoaded(true);
-      console.log("todoLists1:");
-      console.dir(todoLists);
+      //console.dir(todoLists);
     })
     .catch(error => {console.log(error)})
   }
 
   useEffect(() => {
-    if(!isLoaded) getTodoLists(mockapiUrl);
-    //getTodoLists(mockapi);
-    console.log("todoLists2:");
-    console.dir(todoLists);
+    if(!isLoaded) 
+      getTodoLists(mockapiUrl);
+    //console.dir(todoLists);
   }, [todoLists]);
 
   return (

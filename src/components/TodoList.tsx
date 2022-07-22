@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import List from '@mui/material/List';
@@ -108,17 +108,6 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
     setSearch(event.target.value);
   }
 
-  const filterTasks = async () => {
-    console.log(filter);
-    await fetch(mockapiUrl+"todoLists/" + id + "/todoItems" + filter)
-    .then(response => response.json())
-    .then(data => {
-      setTasks(data)
-      console.log(data);
-    })
-    .catch(error => {alert(error)})
-  };
-
   const postItem = async (values: formData) => {
     const requestOptions = {
       method: 'POST',
@@ -133,7 +122,7 @@ const TodoList = ({id, createdAt, title, items}: TodoListProps) => {
     };
     await fetch(mockapiUrl+"todoLists/" + id + "/todoItems", requestOptions)
     .then(async (response) => {
-      if(response.status == 201) {
+      if(response.status === 201) {
         await fetch(mockapiUrl+"todoLists/" + id + "/todoItems")
         .then(response => response.json())
         .then(data => setTasks(data))
