@@ -1,6 +1,13 @@
-# Getting Started with Create React App
+# React To-Do app demo
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).\
+Used technologies:
+- React.js
+- Typescript
+- Material Design
+- React Router
+- form validation (formik, yup)
+- mockapi.io
 
 ## Available Scripts
 
